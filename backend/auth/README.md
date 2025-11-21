@@ -2,7 +2,8 @@
 
 ## Arquitectura Clean Architecture
 
-Este microservicio implementa Clean Architecture con los siguientes principios SOLID:
+Este microservicio implementa Clean Architecture 
+
 
 ### Estructura de Capas
 
