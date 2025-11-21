@@ -9,14 +9,7 @@ interface ProductsListProps {
   error: string | null
 }
 
-/**
- * ProductsList - Componente presentacional puro
- * 
- * Muestra la lista de productos sin lógica de negocio
- * Patrón: Presentational Component
- */
 export function ProductsList({ products, isLoading, error }: ProductsListProps) {
-  // Loading state
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -35,7 +28,6 @@ export function ProductsList({ products, isLoading, error }: ProductsListProps) 
     )
   }
 
-  // Error state
   if (error) {
     return (
       <div className="text-center py-12">
@@ -50,7 +42,6 @@ export function ProductsList({ products, isLoading, error }: ProductsListProps) 
     )
   }
 
-  // Empty state
   if (!products || products.length === 0) {
     return (
       <div className="text-center py-12">
@@ -65,7 +56,6 @@ export function ProductsList({ products, isLoading, error }: ProductsListProps) 
     )
   }
 
-  // Products grid
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {products.map((product) => (

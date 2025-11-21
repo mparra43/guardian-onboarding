@@ -1,4 +1,3 @@
-// Product types
 export interface Product {
   id: string
   name: string
@@ -10,7 +9,7 @@ export interface Product {
 }
 
 export interface ProductsResponse {
-  products: Product[]
+  data: Product[]
   total: number
   page: number
   pageSize: number

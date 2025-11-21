@@ -1,30 +1,24 @@
-'use client'
-
-import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Navbar } from '@/components/layout/Navbar'
+import { BackButton } from '@/components/products/BackButton'
+import { getProductByIdAction } from '@/app/actions/products'
 
-/**
- * Product Detail Page - Página de detalle de producto
- * 
- * Muestra información detallada de un producto específico
- */
-export default function ProductDetailPage() {
-  const params = useParams()
-  const router = useRouter()
-  const productId = params?.id as string
+interface ProductDetailPageProps {
+  params: Promise<{
+    id: string
+  }>
+}
 
-  // Mock data - En producción vendría de una API
-  const product = {
-    id: productId,
-    name: 'Premium Laptop',
-    description: 'High-performance laptop with latest processor and graphics card. Perfect for professional work, gaming, and creative tasks. Features include 16GB RAM, 512GB SSD, and a stunning 15.6" display.',
-    price: 1299.99,
-    category: 'Electronics',
-    imageUrl: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800',
-    stock: 15,
+export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
+  const { id } = await params
+  const product = await getProductByIdAction(id)
+
+  if (!product) {
+    notFound()
   }
 
   return (
@@ -32,33 +26,30 @@ export default function ProductDetailPage() {
       <Navbar />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Button
-          onClick={() => router.back()}
-          variant="ghost"
-          className="mb-6"
-        >
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Volver
-        </Button>
+        <BackButton />
 
         <div className="grid md:grid-cols-2 gap-8">
-          {/* Image Section */}
           <Card>
             <div className="relative h-96 w-full">
-              <Image
-                src={product.imageUrl}
-                alt={product.name}
-                fill
-                className="object-cover rounded-t-lg"
-                priority
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
+              {product.imageUrl ? (
+                <Image
+                  src={product.imageUrl}
+                  alt={product.name}
+                  fill
+                  className="object-cover rounded-t-lg"
+                  priority
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                  <svg className="w-24 h-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              )}
             </div>
           </Card>
 
-          {/* Info Section */}
           <div className="space-y-6">
             <div>
               <div className="flex items-start justify-between mb-2">

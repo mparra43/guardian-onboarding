@@ -1,37 +1,73 @@
 'use client'
 
-import { useProducts } from '@/hooks/useProducts'
+import { useState, useTransition } from 'react'
 import { ProductsList } from './ProductsList'
 import { Button } from '@/components/ui/Button'
+import { createProductsClient } from '@/lib/axios-clients'
+import { ProductsResponse } from '@/types'
 
-/**
- * ProductsContainer - Componente contenedor con lógica
- * 
- * Maneja el estado, paginación y lógica de negocio
- * Delega la presentación al componente ProductsList
- * Patrón: Container Component
- */
-export function ProductsContainer() {
-  const {
-    products,
-    isLoading,
-    error,
-    currentPage,
-    totalPages,
-    total,
-    hasNextPage,
-    hasPrevPage,
-    goToNextPage,
-    goToPrevPage,
-  } = useProducts(1, 6)
+interface ProductsContainerProps {
+  initialData: ProductsResponse | null
+}
+
+export function ProductsContainer({ initialData }: ProductsContainerProps) {
+  const [data, setData] = useState<ProductsResponse | null>(initialData)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
+
+  const products = data?.data || []
+  const total = data?.total || 0
+  const totalPages = Math.ceil(total / 6)
+  const hasNextPage = currentPage < totalPages
+  const hasPrevPage = currentPage > 1
+
+  const fetchProducts = async (page: number) => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const productsClient = createProductsClient()
+      const response = await productsClient.get<ProductsResponse>('/products', {
+        params: { page, limit: 6 }
+      })
+      
+      startTransition(() => {
+        setData(response.data)
+        setCurrentPage(page)
+      })
+    } catch (err: any) {
+      setError(err.message || 'Error al cargar productos')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const goToNextPage = () => {
+    if (hasNextPage && !isLoading) {
+      fetchProducts(currentPage + 1)
+    }
+  }
+
+  const goToPrevPage = () => {
+    if (hasPrevPage && !isLoading) {
+      fetchProducts(currentPage - 1)
+    }
+  }
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages && !isLoading) {
+      fetchProducts(page)
+    }
+  }
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Products</h1>
-          {!isLoading && (
+          {!isLoading && data && (
             <p className="text-gray-600 mt-1">
               {total} {total === 1 ? 'product' : 'products'} available
             </p>
@@ -39,10 +75,8 @@ export function ProductsContainer() {
         </div>
       </div>
 
-      {/* Products List */}
-      <ProductsList products={products} isLoading={isLoading} error={error} />
+      <ProductsList products={products} isLoading={isLoading || isPending} error={error} />
 
-      {/* Pagination */}
       {!isLoading && !error && totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 pt-4">
           <Button
@@ -61,7 +95,7 @@ export function ProductsContainer() {
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <button
                 key={page}
-                onClick={() => {}}
+                onClick={() => goToPage(page)}
                 className={`w-10 h-10 rounded-lg font-medium transition-colors ${
                   page === currentPage
                     ? 'bg-blue-600 text-white'
