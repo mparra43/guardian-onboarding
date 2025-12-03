@@ -19,9 +19,16 @@ export class LoginResponseDto {
   })
   expires_in: number;
 
-  constructor(accessToken: string, expiresIn: number = 300) {
+  @ApiProperty({
+    description: 'Refresh token para obtener nuevos access tokens',
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+  })
+  refresh_token: string;
+
+  constructor(accessToken: string, expiresIn: number = 300, refreshToken: string) {
     this.access_token = accessToken;
     this.token_type = 'Bearer';
     this.expires_in = expiresIn;
+    this.refresh_token = refreshToken;
   }
 }

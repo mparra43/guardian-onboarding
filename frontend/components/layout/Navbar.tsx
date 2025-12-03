@@ -3,10 +3,17 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
-
+import { useAuth } from '@/contexts/AuthContext'
 
 export function Navbar() {
   const pathname = usePathname()
+  const { isAuthenticated, logout } = useAuth()
+
+  const handleLogout = async () => {
+    await logout()
+  }
+
+  const shouldHideAuthButton = pathname === '/login'
 
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
@@ -27,15 +34,22 @@ export function Navbar() {
             </span>
           </Link>
 
-          <div className="flex items-center">
-            <Link href="/login">
-              <Button variant="primary" size="md">
-                Iniciar sesión
-              </Button>
-            </Link>
-          </div>
+          {!shouldHideAuthButton && (
+            <div className="flex items-center">
+              {isAuthenticated ? (
+                <Button variant="primary" size="md" onClick={handleLogout}>
+                  Cerrar sesión
+                </Button>
+              ) : (
+                <Link href="/login">
+                  <Button variant="primary" size="md">
+                    Iniciar sesión
+                  </Button>
+                </Link>
+              )}
+            </div>
+          )}
         </div>
-
       </div>
     </nav>
   )

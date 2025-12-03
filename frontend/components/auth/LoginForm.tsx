@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { useAuth } from '@/contexts/AuthContext'
-import { loginAction } from '@/app/actions/auth'
 import { loginSchema, type LoginFormData } from '@/schemas'
 
 export function LoginForm() {
@@ -29,18 +28,15 @@ export function LoginForm() {
     setSubmitError(null)
 
     try {
-      const result = await loginAction(data)
-
+      const result = await login(data)
+      
       if (result.success && result.user) {
-        login(result.user)
-
-        if (!result.user.onboardingCompleted) {
-          router.push('/onboarding')
-        } else {
+        // Navigate based on onboarding status
+        if (result.user.onboardingCompleted) {
           router.push('/products')
+        } else {
+          router.push('/onboarding')
         }
-      } else {
-        setSubmitError(result.error || 'Login failed')
       }
     } catch (error: any) {
       setSubmitError(error.message || 'An unexpected error occurred')

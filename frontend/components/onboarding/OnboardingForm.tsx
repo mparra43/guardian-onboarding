@@ -39,7 +39,13 @@ export function OnboardingForm({ children, onSubmit, defaultValues }: Onboarding
   } = useForm<OnboardingFormData>({
     resolver: zodResolver(onboardingSchema),
     mode: 'onBlur',
-    defaultValues,
+    defaultValues: {
+      nombre: '',
+      documento: '',
+      email: '',
+      montoInicial: '',
+      ...defaultValues,
+    },
   })
 
   const contextValue: OnboardingFormContextValue = {
@@ -81,6 +87,8 @@ OnboardingForm.Field = function Field({
       render={({ field }) => (
         <Input
           {...field}
+          value={field.value ?? ''}
+          onChange={(e) => field.onChange(e.target.value)}
           type={type}
           label={label}
           placeholder={placeholder}

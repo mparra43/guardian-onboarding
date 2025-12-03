@@ -3,7 +3,6 @@
 import { useState, useTransition } from 'react'
 import { ProductsList } from './ProductsList'
 import { Button } from '@/components/ui/Button'
-import { createProductsClient } from '@/lib/axios-clients'
 import { ProductsResponse } from '@/types'
 
 interface ProductsContainerProps {
@@ -28,13 +27,16 @@ export function ProductsContainer({ initialData }: ProductsContainerProps) {
     setError(null)
 
     try {
-      const productsClient = createProductsClient()
-      const response = await productsClient.get<ProductsResponse>('/products', {
-        params: { page, limit: 6 }
-      })
+      const response = await fetch(`/api/products?page=${page}&limit=6`)
+      
+      if (!response.ok) {
+        throw new Error('Error al cargar productos')
+      }
+
+      const responseData: ProductsResponse = await response.json()
       
       startTransition(() => {
-        setData(response.data)
+        setData(responseData)
         setCurrentPage(page)
       })
     } catch (err: any) {

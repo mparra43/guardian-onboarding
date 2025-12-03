@@ -36,8 +36,9 @@ jest.mock('next/image', () => ({
 }))
 
 // Mock environment variables
-process.env.NEXT_PUBLIC_AUTH_SERVICE_URL = 'http://localhost:3001'
-process.env.NEXT_PUBLIC_PRODUCTS_SERVICE_URL = 'http://localhost:3002'
+process.env.AUTH_SERVICE_URL = 'http://localhost:3001'
+process.env.PRODUCTS_SERVICE_URL = 'http://localhost:3002/api'
+process.env.ONBOARDING_SERVICE_URL = 'http://localhost:3003/api'
 process.env.NEXT_PUBLIC_APP_NAME = 'Guardian Onboarding Test'
 process.env.NEXT_PUBLIC_USE_MOCKS = 'true'
 process.env.ONBOARDING_SERVICE_URL = 'http://localhost:3003'

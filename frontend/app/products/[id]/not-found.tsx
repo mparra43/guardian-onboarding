@@ -1,11 +1,9 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
-import { Navbar } from '@/components/layout/Navbar'
 
 export default function ProductNotFound() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center py-12">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mb-4">

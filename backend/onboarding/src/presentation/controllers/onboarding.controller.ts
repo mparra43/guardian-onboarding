@@ -26,6 +26,8 @@ import { HealthResponseDto } from '@application/dto/health-response.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @ApiTags('Onboarding')
+@ApiBearerAuth('JWT')
+@UseGuards(JwtAuthGuard)
 @Controller('onboarding')
 @UseInterceptors(ClassSerializerInterceptor)
 export class OnboardingController {
@@ -36,9 +38,7 @@ export class OnboardingController {
   ) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.CREATED)
-  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Crear nuevo onboarding',
     description:

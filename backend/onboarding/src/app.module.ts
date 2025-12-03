@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 
@@ -34,12 +34,11 @@ import { ONBOARDING_REPOSITORY } from '@domain/repositories/onboarding.repositor
 
     // JWT Module
     JwtModule.registerAsync({
-      useFactory: () => ({
-        secret:
-          process.env.JWT_SECRET ||
-          'guardian-secret-key-change-in-production',
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('jwt.secret'),
         signOptions: {
-          expiresIn: '5m',
+          expiresIn: configService.get('jwt.signOptions.expiresIn') || '5m',
         },
       }),
     }),

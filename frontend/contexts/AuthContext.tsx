@@ -2,14 +2,21 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { User } from '@/types/auth'
+import { LoginCredentials, User } from '@/types/auth'
 import { clientCookies } from '@/lib/cookies.client'
+import { createAuthClient } from '@/lib/axios-clients'
+
+interface LoginResult {
+  success: boolean
+  user?: User
+  error?: string
+}
 
 interface AuthContextValue {
   user: User | null
   isAuthenticated: boolean
   isLoading: boolean
-  login: (user: User) => void
+  login: (user: LoginCredentials) => Promise<LoginResult>
   logout: () => Promise<void>
   updateUser: (user: Partial<User>) => void
 }
@@ -38,21 +45,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initAuth()
   }, [])
 
-  const login = useCallback((userData: User) => {
-    setUser(userData)
+  const login = useCallback(async (userData: LoginCredentials) => {
+    const { loginAction } = await import('@/app/actions/auth')
+    const result = await loginAction(userData)
+    
+    if (result.success && result.user) {
+      setUser(result.user)
+      return result
+    }
+    
+    throw new Error(result.error || 'Login failed')
   }, [])
 
   const logout = useCallback(async () => {
     try {
-      const response = await fetch('/api/auth/logout', {
-        method: 'POST',
-      })
-
-      if (response.ok) {
-        setUser(null)
-        clientCookies.clearAuth()
-        router.push('/login')
-      }
+      const { logoutAction } = await import('@/app/actions/auth')
+      await logoutAction()
+      
+      setUser(null)
+      clientCookies.clearAuth()
+      router.push('/login')
     } catch (error) {
       console.error('Logout failed:', error)
       setUser(null)

@@ -14,14 +14,24 @@ function OnboardingPage() {
   const router = useRouter()
   const { updateUser } = useAuth()
   const [submitError, setSubmitError] = useState<string | null>(null)
-  const [draftData, setDraftData] = useState<Partial<OnboardingFormData>>({})
+  const [draftData, setDraftData] = useState<Partial<OnboardingFormData>>({
+    nombre: '',
+    documento: '',
+    email: '',
+    montoInicial: '',
+  })
 
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) {
         const parsed = JSON.parse(stored)
-        setDraftData(parsed)
+        setDraftData({
+          nombre: parsed.nombre || '',
+          documento: parsed.documento || '',
+          email: parsed.email || '',
+          montoInicial: parsed.montoInicial || '',
+        })
       }
     } catch (error) {
       console.error('Failed to load draft:', error)
@@ -32,8 +42,11 @@ function OnboardingPage() {
     setSubmitError(null)
 
     try {
+      // Convert montoInicial from string to number for API
       const submitData = {
-        ...data,
+        nombre: data.nombre,
+        documento: data.documento,
+        email: data.email,
         montoInicial: parseFloat(data.montoInicial),
       }
 
@@ -52,8 +65,9 @@ function OnboardingPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 px-4 py-8">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-gray-50">
+      <main className="max-w-2xl mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto">
         <Card>
           <CardHeader>
             <h1 className="text-3xl font-bold text-gray-900">Completa tu perfil</h1>
@@ -129,8 +143,9 @@ function OnboardingPage() {
             </div>
           </CardBody>
         </Card>
-      </div>
-    </main>
+        </div>
+      </main>
+    </div>
   )
 }
 

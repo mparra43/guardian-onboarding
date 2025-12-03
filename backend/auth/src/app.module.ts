@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './presentation/controllers/auth.controller';
 import { LoginUseCase } from './application/use-cases/login.use-case';
+import { RefreshTokenUseCase } from './application/use-cases/refresh-token.use-case';
 import { InMemoryUserRepository } from './infrastructure/adapters/in-memory-user.repository';
 import { USER_REPOSITORY } from './domain/repositories/user.repository.interface';
 import jwtConfig from './infrastructure/config/jwt.config';
@@ -26,6 +27,7 @@ import jwtConfig from './infrastructure/config/jwt.config';
   controllers: [AuthController],
   providers: [
     LoginUseCase,
+    RefreshTokenUseCase,
     {
       provide: USER_REPOSITORY,
       useClass: InMemoryUserRepository,

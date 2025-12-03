@@ -4,45 +4,22 @@ import { serverCookies } from '@/lib/cookies.server'
 import { createOnboardingClient } from '@/lib/axios-clients'
 import { OnboardingData, OnboardingResponse } from '@/types/auth'
 
+/**
+ * Server Action: Submit onboarding data
+ * 
+ * Sends data to ONBOARDING_SERVICE using Axios client with Bearer token
+ * Requires authentication token from httpOnly cookie
+ */
 export async function submitOnboardingAction(data: OnboardingData) {
   try {
     const token = await serverCookies.getToken()
     
-    if (!token) {
-      return {
-        success: false,
-        error: 'Not authenticated',
-      }
-    }
+ console.log('Onboarding token:', token)
 
-    if (process.env.NEXT_PUBLIC_USE_MOCKS === 'true') {
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      
-      const userData = await serverCookies.getUserData()
-      if (userData) {
-        await serverCookies.setUserData({
-          ...userData,
-          onboardingCompleted: true,
-          name: data.nombre,
-        })
-      }
-      
-      return {
-        success: true,
-        data: {
-          success: true,
-          message: 'Onboarding completed successfully',
-          data: {
-            id: 'onb_' + Date.now(),
-            completedAt: new Date().toISOString(),
-          },
-        },
-      }
-    }
-
+    // Call ONBOARDING_SERVICE using Axios client with Bearer token
     const onboardingClient = createOnboardingClient(() => token)
-    const response = await onboardingClient.post<OnboardingResponse>('/onboarding/submit', data)
-    
+    const response = await onboardingClient.post<OnboardingResponse>('/onboarding', data)
+    console.log('Onboarding response:', response.data)
     const userData = await serverCookies.getUserData()
     if (userData) {
       await serverCookies.setUserData({

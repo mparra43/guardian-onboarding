@@ -44,6 +44,7 @@ const errorInterceptor = (error: AxiosError): Promise<never> => {
 }
 
 export const createAuthClient = (): AxiosInstance => {
+
   const client = axios.create({
     baseURL: process.env.NEXT_PUBLIC_AUTH_SERVICE_URL,
     timeout: 10000,
@@ -85,7 +86,7 @@ export const createProductsClient = (): AxiosInstance => {
 
 export const createOnboardingClient = (getToken: () => string | null): AxiosInstance => {
   const client = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_ONBOARDING_SERVICE_URL || process.env.ONBOARDING_SERVICE_URL,
+    baseURL: process.env.NEXT_PUBLIC_ONBOARDING_SERVICE_URL,
     timeout: 15000,
     headers: {
       'Content-Type': 'application/json',

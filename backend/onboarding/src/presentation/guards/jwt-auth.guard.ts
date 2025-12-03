@@ -1,40 +1,43 @@
 import {
-  Injectable,
+  CanActivate,
   ExecutionContext,
+  Injectable,
   UnauthorizedException,
   Logger,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtService } from '@nestjs/jwt';
+import { Request } from 'express';
 
 @Injectable()
-export class JwtAuthGuard extends AuthGuard('jwt') {
-  private readonly logger = new Logger(JwtAuthGuard.name);
+export class JwtAuthGuard implements CanActivate {
+   private readonly logger = new Logger(JwtAuthGuard.name);
+  constructor(private readonly jwtService: JwtService) {}
 
-  canActivate(context: ExecutionContext) {
-    return super.canActivate(context);
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest<Request>();
+    const token = this.extractToken(request);
+
+    if (!token) {
+      throw new UnauthorizedException('Token missing');
+    }
+    
+    try {
+  
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_SECRET,
+      });
+      request['username'] = payload; 
+      return true;
+    } catch {
+      throw new UnauthorizedException('Invalid token');
+    }
   }
 
-  handleRequest(err: any, user: any, info: any, context: ExecutionContext) {
-    const request = context.switchToHttp().getRequest();
-    const requestId = request.headers['x-request-id'] || 'no-request-id';
+  private extractToken(req: Request): string | null {
+    const auth = req.headers.authorization;
+    if (!auth) return null;
 
-    if (err || !user) {
-      this.logger.error(
-        `Intento de autenticación fallido [RequestId: ${requestId}] - ${info?.message || 'Token inválido'}`,
-      );
-
-      throw (
-        err ||
-        new UnauthorizedException(
-          'No autorizado: Token inválido o expirado',
-        )
-      );
-    }
-
-    this.logger.log(
-      `Autenticación exitosa [RequestId: ${requestId}] - Usuario: ${user.userId}`,
-    );
-
-    return user;
+    const [type, token] = auth.split(' ');
+    return type === 'Bearer' ? token : null;
   }
 }

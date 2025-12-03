@@ -1,5 +1,4 @@
-﻿import { Navbar } from '@/components/layout/Navbar'
-import { ProductsContainer } from '@/components/products/ProductsContainer'
+﻿import { ProductsContainer } from '@/components/products/ProductsContainer'
 import { getProductsAction } from '@/app/actions/products'
 
 export default async function HomePage() {
@@ -7,8 +6,6 @@ export default async function HomePage() {
   
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <ProductsContainer initialData={initialData} />
       </main>

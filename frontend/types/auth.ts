@@ -11,8 +11,17 @@ export interface LoginCredentials {
 }
 
 export interface LoginResponse {
-  token: string
-  user: User
+  access_token: string
+  token_type: string
+  expires_in: number
+}
+
+export interface DecodedToken {
+  sub: string
+  username: string
+  email: string
+  iat: number
+  exp: number
 }
 
 export interface OnboardingData {
